@@ -1,0 +1,3 @@
+Just send the command line to be executed. 
+The shell is non-interactive so please use commands that do not require confirmation
+(ex: 'apt-get -y install ...' instead of 'apt-get install ...')

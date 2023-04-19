@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# - Loops throuh stdin reading a command on each line
+# - Executes the command, capturing the output and exit code
+# - Truncates the output to 256 characters
+# - Prints the exit code and output
+# - If there is no output, prints "no output"
+# - If the output is truncated, prints "truncated"
+
+while read -r command; do
+    # If the command is cd, then we need to change the directory
+    if [[ $command == "cd "* ]]; then
+        cd "${command:3}"
+        continue
+    fi
+    output=$(eval "$command 2>&1")
+    exit_code=$?
+    if [ -n "$output" ]; then
+       
+        if [ ${#output} -gt 256 ]; then
+            output="(truncated)...${output:0:256}"
+        fi
+        echo "Exit code: $exit_code, Output:"
+        echo "$output"
+    else
+        echo "Exit code: $exit_code, No output"
+    fi
+    echo "{{ENDCOMMAND}}"
+done
+

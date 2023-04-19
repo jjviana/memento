@@ -1,0 +1,3 @@
+- Protect against runaway loops (max number of execution steps)
+- Forget things: command outputs, error messages, etc. How to decide what to forget?
+- Create a code writing tool: editor tool, code gnerator tool, etc.

@@ -1,0 +1,18 @@
+The following commands are available in the fs tool:
+
+read_file filepath - reads the contents of the file
+write_file filepath
+           content - writes the content to the file, overwriting any existing content
+delete_file filepath - deletes the file
+create_directory filepath - creates a directory
+delete_directory filepath - deletes the directory
+list_directory filepath - lists the contents of the directory
+move_file filepath new_filepath - moves the file or directory to the new location, or renames it. 
+
+filepath is the raw path to the file or directory, without any aditional prefix.
+Glob patterns are not supported.
+To edit a file, you can read its contents first and then write the new contents back to the file.
+
+
+ 
+
