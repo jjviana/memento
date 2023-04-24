@@ -23,7 +23,9 @@ def exec_commands(first_line,remaining_lines):
     comp = first_line.split(" ")
     if len(comp) < 2:
         print("Invalid command syntax (expected <command> <filename>)")
+        print("{{ENDCOMMAND}}")
         return
+    
     command = comp[0]
     filename = comp[1]
     filename=filename.strip()

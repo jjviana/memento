@@ -1,4 +1,5 @@
 import os
+from prompts.template import IncludeTemplate
 
 class PromptsManager:
 
@@ -8,5 +9,6 @@ class PromptsManager:
     def get_prompt(self,prompt_name:str) -> str:
         prompt_path = os.path.join(self.bot_dir,prompt_name+".txt")
         with open(prompt_path) as f:
-            return f.read()
-    
+            content = f.read()
+            return IncludeTemplate(content).substitute()
+

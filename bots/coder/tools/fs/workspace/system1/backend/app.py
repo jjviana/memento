@@ -32,5 +32,10 @@ def register():
     db.session.commit()
     return jsonify({'message': 'User created successfully'}), 201
 
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify([user.serialize() for user in users]), 200
+
 if __name__ == '__main__':
     app.run(debug=True,port=5050)

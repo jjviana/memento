@@ -1,6 +1,7 @@
 from .language_model import LanguageModel
 import openai
 import datetime
+from typing import Callable
 
 class Message:
     def __init__(self, role: str, content: str):
@@ -25,21 +26,21 @@ class GPT_35(LanguageModel):
     def model_name(self) -> str:
         return "gpt-3.5-turbo"
 
-    def __init__(self, api_key: str,log_file: str):
+    def __init__(self, api_key: str,logger: Callable = None):
         openai.api_key = api_key
-        self.log_file = open(log_file, "a") if log_file else None
+        self.logger = logger
         self.messages = []
 
     def _logMessage(self, message: str,total_tokens_used: int):
-        if self.log_file:
-            self._log(f"{message.tokens_used} / {total_tokens_used} - {message}")
+        if self.logger:
+            self.logger(f"{message.tokens_used} / {total_tokens_used} - {message}")
 
     
     def _log(self,rawMessage: str):
-        if self.log_file:
+        if self.logger:
             # Write a message preceded by a timestamp in the format YYYY-MM-DD HH:MM:SS
-            self.log_file.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {rawMessage}\n")
-            self.log_file.flush()
+            self.logger(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {rawMessage}\n")
+            
 
                               
             

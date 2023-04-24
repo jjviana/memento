@@ -1,9 +1,13 @@
 import os
-import subprocess
+from typing import Callable
+from .subprocess_tool import SubProcessTool
+from tools_manager.utils import _load_file,utf8
+from prompts import PromptsManager
 class ToolsManager:
-    def __init__(self, base_dir: str):
+    def __init__(self, base_dir: str,memento_factory: Callable = None):
         self.tools = {}
         self.base_dir = base_dir
+        self.memento_factory = memento_factory
         self.load_tools()
     
     def load_tools(self):
@@ -13,7 +17,14 @@ class ToolsManager:
             if tool=="" or tool == "." or tool == ".." or tool.startswith("_"):
                 continue
             if os.path.isdir(os.path.join(self.base_dir, tool)):
-                    self.tools[tool] = Tool(tool, self.base_dir)
+                    # If the directory contains a file called "run" then it is a subprocess tool.
+                    # If it contains a file called start.txt, then it is a memento tool
+                    # otherwise we have an error.
+                    if os.path.isfile(os.path.join(self.base_dir, tool, "run")):
+                        self.tools[tool] = SubProcessTool(tool, self.base_dir)
+                    elif os.path.isfile(os.path.join(self.base_dir, tool, "start.txt")):
+                        tool_base_dir = os.path.join(self.base_dir, tool)
+                        self.tools[tool] = MementoTool(tool, tool_base_dir, self.memento_factory)
 
         # The system and user tools are always available
         self.tools["system"] = SystemTool(self)
@@ -34,9 +45,15 @@ class ToolsManager:
             return "system","Invalid format"
         
         tool_name = command[command.find("TO:")+3:command.find("}}")]
+        # ignore anything in the tool name after reason=
+        if " reason=" in tool_name:
+            tool_name = tool_name[:tool_name.find(" reason=")]
+            tool_name = tool_name.strip()
+
         command = command[command.find("}}")+2:]
         command = command[:command.find("{{END}}")]
         command = command.strip()
+        
         
         # Process the command
         if tool_name in self.tools:
@@ -46,54 +63,11 @@ class ToolsManager:
         
         
     
-def utf8(s):
-        return s.encode('utf-8')
 
-class Tool:
 
-    BEGIN_COMMAND_SENTINEL="{{BEGINCOMMAND}}"
-    ENDCOMMAND_SENTINEL="{{ENDCOMMAND}}"
-
-    def __init__(self, name: str, base_dir: str):
-        self.name = name
-        self.base_dir = base_dir
-        self.subprocess = None
-        
-        # Each tool has a description file (description.txt) and a help file (help.txt)
-        self.description = self._load_file("description.txt")
-        self.help = self._load_file("help.txt")
-
-   
     
-    def process_command(self, command: str) -> str:
-        
-        if command == "help":
-            return self.help
-        
-        if self.subprocess is None or self.subprocess.poll() is not None:
-            self.subprocess = subprocess.Popen([os.path.join(self.base_dir,self.name, "run")], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        
-        # Send the command to the tool
-        self.subprocess.stdin.write(utf8("\n"+Tool.BEGIN_COMMAND_SENTINEL+"\n"))
-        self.subprocess.stdin.write(utf8((command)))
-        self.subprocess.stdin.write(utf8("\n"+Tool.ENDCOMMAND_SENTINEL+"\n"))
-        self.subprocess.stdin.flush()
 
-        # Read the result - it can contain multiple lines
-        result = ""
-        while True:
-            line = self.subprocess.stdout.readline().decode("utf-8")
-            if line.strip() == Tool.ENDCOMMAND_SENTINEL:
-                break
-            result = result + line
-        
-        return result
-     
-        
-        
-    def _load_file(self, file_name: str) -> str:
-        with open(os.path.join(self.base_dir, self.name, file_name), "r") as f:
-            return f.read()
+
     
 class SystemTool:
 
@@ -117,7 +91,7 @@ class SystemTool:
                 if command == "help":
                     return self.help
 
-        return "Available commands are:\n list_tools: List all available tools.\nhelp: Get help for a tool."
+        return "Invalid command received.Available commands are:\n list_tools: List all available tools.\nhelp: Get help for a tool."
         
     def _list_tools(self) -> str:
         result = "Available tools:\n"
@@ -132,7 +106,31 @@ class UserTool:
     
     def process_command(self, command: str) -> str:
        return command
+
+class MementoTool:
+    def __init__(self, name: str, base_dir: str, memento_factory: Callable):
+        
+        self.tools_manager = ToolsManager(os.path.join(base_dir, "tools"), memento_factory)
+        self.prompts_manager = PromptsManager(base_dir)
+        self.memento = memento_factory(self.tools_manager,self.prompts_manager,name)
+        self.memento_initialized = False
+        self.name = name
+        self.description = _load_file(base_dir, ".", "description.txt")
+        self.help = _load_file(base_dir, ".", "help.txt")
+        
     
+    def process_command(self, command: str) -> str:
+        if command == "help":
+            return self.help
+        
+        if not self.memento_initialized:
+            self.memento.start()
+            self.memento_initialized = True
+        
+        return self.memento.process(command)
+
+
+
    
     
    
