@@ -1,8 +1,0 @@
-You can send a description of the files you want to search for in natural language.
-I will return a list of file names that match what you are looking for.
-
-Example requests:
-'files with the word "hello" in the name'
-'javascript files'
-'files containing the string "jdbc"'
-

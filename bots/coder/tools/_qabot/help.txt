@@ -1,0 +1,9 @@
+Syntax:
+File: <file or directory name> <action>
+
+Where action is: 
+Question: <question>
+or 
+Describe 
+or
+Summarize

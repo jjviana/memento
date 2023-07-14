@@ -5,6 +5,10 @@ WORKSPACE_DIR="workspace"
 os.makedirs(WORKSPACE_DIR,exist_ok=True)
 os.chdir(WORKSPACE_DIR)
 
+def print_help():
+    with open("../help.txt","r") as f:
+        print(f.read())
+
 def format_list_dir(basedir,result):
     # Format the result of os.listdir
     # returning a string with the list of files and directories
@@ -101,6 +105,7 @@ def exec_commands(first_line,remaining_lines):
                 print(f"Error moving file {filename} to {new_filename}: {e}")
     else:
         print("Unknown command: " + command)
+        print_help()
     
 
     print("{{ENDCOMMAND}}")

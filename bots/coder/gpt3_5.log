@@ -30986,3 +30986,619 @@ def login():
 This function handles a POST request to the `/api/login` endpoint. It retrieves the username and password from the request JSON, queries the database for a user with the given username, and checks if the password matches the hashed password stored in the database. If the username or password is invalid, it returns a 401 Unauthorized response with a JSON message. If the login is successful, it returns a 200 OK response with a JSON message.
 
 Let me know if you need any further assistance.{{END}}
+top_level->692 / 715 - system: You are an AI assistant that can use tools.
+You use tools by sending messages to them. The tools generate a response by sending a message back to you.
+To send a message to a tool, use the syntax:
+{{FROM:assistant TO:toolnamme}}
+ <message>
+{{END}}
+
+When you get a message from a tool it will be in the following format:
+{{FROM:toolname TO:assistant}}
+ <message>
+{{END}}
+If you get an error message from a tool you should send it the help message to learn how to use it.
+If it still doesn't work you should give up and try another tool or tell the user that you cannot complete the task.
+if you get the error "Invalid message format" from the system, you should resend the message in the expected format.
+There are 2 special tools: user and system
+The user tool sends and receives messages to/from the user.
+
+The system tool is used to find available tools and to interact with the system in general.
+
+When you receive user instructions, you must try to complete the task using the available tools.
+You can use the list_tools tool to check if there are available tools that can help you complete the task.
+
+To learn how to use a tool you can send the "help" message to the tool. The tool will respond with instructions.
+
+If you cannot complete the task using the available tools (or a combination of them) you must tell the user that you cannot complete the task.
+
+DO NOT send plain messages, alyways use the syntax above.
+DO NOT try to use any tools other than the ones provided. You can ask the user to execute any actions you need that are not provided by the existing tools.
+You should try using more specific tools first, and only use the generic tools if you cannot find a more specific tool.
+=== BEGIN EXAMPLE ===
+Here is an example of interaction between you, the user and the system:
+
+{{FROM:user TO:assistant}}
+Hello, I need to list all the files in the current directory
+{{END}}
+
+{{FROM:assistant TO:system}}
+list_tools
+{{END}}
+
+{{FROM:system TO:assistant}}
+Available tools: user,system,file_system
+{{END}}
+
+{{FROM:assistant TO:file_system}}
+help
+{{END}}
+
+{{FROM:file_system TO:assistant}}
+Available commands: list_files
+{{END}}
+
+{{FROM:assistant TO:file_system}}
+list_files
+{{END}}
+
+{{FROM:file_system TO:assistant}}
+file1.py,file2txt,file3.jpg
+{{END}}
+
+{{FROM:assistant TO:user}}
+file3.jpg
+{{END}}
+
+=== END EXAMPLE ===
+
+You should only generate messages from assistant, do not impersonate any other tool. 
+
+Your main function as an agent is to assist the user in a coding project.
+A few important facts about the projet:
+- The project is called "System 1" and is in the "system1" directory.
+- The project has a Python flask backend and a react frontend
+- The project has a sqlite database managed with sqlalchemy
+- You can find more information about the project structure in 'system1/readme.txt'
+- You can read and write files but not execute commands yourself. You can ask the user to execute commands for you.
+
+Your first task is to send a message to the user presenting yourself, and then wait for further instructions.
+
+
+
+top_level->23 / 715 - assistant: {{FROM:assistant TO:user}}
+Hello, I am your AI assistant. How can I assist you today? 
+{{END}}
+top_level->692 / 715 - system: You are an AI assistant that can use tools.
+You use tools by sending messages to them. The tools generate a response by sending a message back to you.
+To send a message to a tool, use the syntax:
+{{FROM:assistant TO:toolnamme}}
+ <message>
+{{END}}
+
+When you get a message from a tool it will be in the following format:
+{{FROM:toolname TO:assistant}}
+ <message>
+{{END}}
+If you get an error message from a tool you should send it the help message to learn how to use it.
+If it still doesn't work you should give up and try another tool or tell the user that you cannot complete the task.
+if you get the error "Invalid message format" from the system, you should resend the message in the expected format.
+There are 2 special tools: user and system
+The user tool sends and receives messages to/from the user.
+
+The system tool is used to find available tools and to interact with the system in general.
+
+When you receive user instructions, you must try to complete the task using the available tools.
+You can use the list_tools tool to check if there are available tools that can help you complete the task.
+
+To learn how to use a tool you can send the "help" message to the tool. The tool will respond with instructions.
+
+If you cannot complete the task using the available tools (or a combination of them) you must tell the user that you cannot complete the task.
+
+DO NOT send plain messages, alyways use the syntax above.
+DO NOT try to use any tools other than the ones provided. You can ask the user to execute any actions you need that are not provided by the existing tools.
+You should try using more specific tools first, and only use the generic tools if you cannot find a more specific tool.
+=== BEGIN EXAMPLE ===
+Here is an example of interaction between you, the user and the system:
+
+{{FROM:user TO:assistant}}
+Hello, I need to list all the files in the current directory
+{{END}}
+
+{{FROM:assistant TO:system}}
+list_tools
+{{END}}
+
+{{FROM:system TO:assistant}}
+Available tools: user,system,file_system
+{{END}}
+
+{{FROM:assistant TO:file_system}}
+help
+{{END}}
+
+{{FROM:file_system TO:assistant}}
+Available commands: list_files
+{{END}}
+
+{{FROM:assistant TO:file_system}}
+list_files
+{{END}}
+
+{{FROM:file_system TO:assistant}}
+file1.py,file2txt,file3.jpg
+{{END}}
+
+{{FROM:assistant TO:user}}
+file3.jpg
+{{END}}
+
+=== END EXAMPLE ===
+
+You should only generate messages from assistant, do not impersonate any other tool. 
+
+Your main function as an agent is to assist the user in a coding project.
+A few important facts about the projet:
+- The project is called "System 1" and is in the "system1" directory.
+- The project has a Python flask backend and a react frontend
+- The project has a sqlite database managed with sqlalchemy
+- You can find more information about the project structure in 'system1/readme.txt'
+- You can read and write files but not execute commands yourself. You can ask the user to execute commands for you.
+
+Your first task is to send a message to the user presenting yourself, and then wait for further instructions.
+
+
+
+top_level->23 / 715 - assistant: {{FROM:assistant TO:user}}
+Hello, I am your AI assistant. How can I assist you today? 
+{{END}}
+top_level->42 / 776 - user: {{FROM:user TO:assistant}}
+I need to find where the login api call is handled. Can you find it for me?
+{{END}}
+top_level->19 / 776 - assistant: {{FROM:assistant TO:file_system}}
+search /system1 -f "app.py"
+{{END}}
+top_level->30 / 817 - user: {{FROM:system TO:assistant}}
+Unknown tool: file_system
+{{END}}
+top_level->11 / 817 - assistant: {{FROM:assistant TO:system}}
+list_tools
+{{END}}
+top_level->70 / 906 - user: {{FROM:system TO:assistant}}
+Available tools:
+code_search: A tool for searching the code base. .
+fs: Provides tools for file and directory manipulation.
+system: Used to interact with the system.
+user: Used to send and receive messages to the user.
+
+{{END}}
+top_level->19 / 906 - assistant: {{FROM:assistant TO:code_search}}
+search /system1 -f "app.py"
+{{END}}
+code_search->788 / 797 - system: You are an AI assistant that can use tools.
+You use tools by sending messages to them. The tools generate a response by sending a message back to you.
+To send a message to a tool, use the syntax:
+{{FROM:assistant TO:toolnamme}}
+ <message>
+{{END}}
+
+When you get a message from a tool it will be in the following format:
+{{FROM:toolname TO:assistant}}
+ <message>
+{{END}}
+If you get an error message from a tool you should send it the help message to learn how to use it.
+If it still doesn't work you should give up and try another tool or tell the user that you cannot complete the task.
+if you get the error "Invalid message format" from the system, you should resend the message in the expected format.
+There are 2 special tools: user and system
+The user tool sends and receives messages to/from the user.
+
+The system tool is used to find available tools and to interact with the system in general.
+
+When you receive user instructions, you must try to complete the task using the available tools.
+You can use the list_tools tool to check if there are available tools that can help you complete the task.
+
+To learn how to use a tool you can send the "help" message to the tool. The tool will respond with instructions.
+
+If you cannot complete the task using the available tools (or a combination of them) you must tell the user that you cannot complete the task.
+
+DO NOT send plain messages, alyways use the syntax above.
+DO NOT try to use any tools other than the ones provided. You can ask the user to execute any actions you need that are not provided by the existing tools.
+You should try using more specific tools first, and only use the generic tools if you cannot find a more specific tool.
+=== BEGIN EXAMPLE ===
+Here is an example of interaction between you, the user and the system:
+
+{{FROM:user TO:assistant}}
+Hello, I need to list all the files in the current directory
+{{END}}
+
+{{FROM:assistant TO:system}}
+list_tools
+{{END}}
+
+{{FROM:system TO:assistant}}
+Available tools: user,system,file_system
+{{END}}
+
+{{FROM:assistant TO:file_system}}
+help
+{{END}}
+
+{{FROM:file_system TO:assistant}}
+Available commands: list_files
+{{END}}
+
+{{FROM:assistant TO:file_system}}
+list_files
+{{END}}
+
+{{FROM:file_system TO:assistant}}
+file1.py,file2txt,file3.jpg
+{{END}}
+
+{{FROM:assistant TO:user}}
+file3.jpg
+{{END}}
+
+=== END EXAMPLE ===
+
+You should only generate messages from assistant, do not impersonate any other tool. 
+You are a code search assistant.
+You will receive a search query in natural language from the user.
+You must find the files that match the queries and return them.
+To find the files you will list directories and read files.
+You will only read files when needed, and you will only read the files once.
+You will return the matching file names ony by line, in a single message.
+You will return the files in the following format:
+{{FROM:assistant TO:user}}
+ <file1>
+ <file2>
+ <file3>
+{{END}}
+If you cannot find any files that satisfy the query, you must tell the user that you cannot complete the task.
+In this case the response should be in the following format:
+{{FROM:assistant TO:user}}
+ No files found
+{{END}}
+You only have access to the fs tool. You don't have access to a search command, so you will have to search the files yourself. 
+The project is called "System 1" and is in the "system1" directory.
+Your first task is to send a message to the user with the message "Ready".
+
+
+
+code_search->9 / 797 - assistant: {{FROM:assistant TO:user}}
+Ready
+{{END}}
+code_search->33 / 844 - user: {{FROM:user TO:assistant}}
+search /system1 -f "app.py"
+{{END}}
+code_search->14 / 844 - assistant: {{FROM:assistant TO:fs}}
+list_dir /system1
+{{END}}
+code_search->30 / 884 - user: {{FROM:fs TO:assistant}}
+Unknown command: list_dir
+
+{{END}}
+code_search->10 / 884 - assistant: {{FROM:assistant TO:fs}}
+help
+{{END}}
+code_search->169 / 1067 - user: {{FROM:fs TO:assistant}}
+The following commands are available in the fs tool:
+
+read_file filepath - reads the contents of the file
+write_file filepath
+           content - writes the content to the file, overwriting any existing content
+delete_file filepath - deletes the file
+create_directory filepath - creates a directory
+delete_directory filepath - deletes the directory
+list_directory filepath - lists the contents of the directory
+move_file filepath new_filepath - moves the file or directory to the new location, or renames it. 
+
+filepath is the raw path to the file or directory, without any aditional prefix.
+Glob patterns are not supported.
+To edit a file, you can read its contents first and then write the new contents back to the file.
+
+
+ 
+
+
+{{END}}
+code_search->14 / 1067 - assistant: {{FROM:assistant TO:fs}}
+list_directory /system1
+{{END}}
+code_search->47 / 1125 - user: {{FROM:fs TO:assistant}}
+Directory /system1 not found: [Errno 2] No such file or directory: '/system1'
+
+{{END}}
+code_search->11 / 1125 - assistant: {{FROM:assistant TO:fs}}
+list_directory /
+{{END}}
+code_search->48 / 1184 - user: {{FROM:fs TO:assistant}}
+Directory / not found: [Errno 2] No such file or directory: '/.VolumeIcon.icns'
+
+{{END}}
+code_search->11 / 1184 - assistant: {{FROM:assistant TO:fs}}
+list_directory 
+{{END}}
+code_search->36 / 1231 - user: {{FROM:fs TO:assistant}}
+Invalid command syntax (expected <command> <filename>)
+
+{{END}}
+code_search->11 / 1231 - assistant: {{FROM:assistant TO:fs}}
+list_directory ""
+{{END}}
+code_search->44 / 1286 - user: {{FROM:fs TO:assistant}}
+Directory "" not found: [Errno 2] No such file or directory: '""'
+
+{{END}}
+code_search->11 / 1286 - assistant: {{FROM:assistant TO:fs}}
+list_directory .
+{{END}}
+code_search->33 / 1333 - user: {{FROM:fs TO:assistant}}
+Directory . contents:
+d ./system1
+
+
+{{END}}
+code_search->14 / 1333 - assistant: {{FROM:assistant TO:fs}}
+list_directory ./system1
+{{END}}
+code_search->72 / 1421 - user: {{FROM:fs TO:assistant}}
+Directory ./system1 contents:
+d ./system1/frontend
+d ./system1/backend
+f ./system1/package-lock.json 24280
+f ./system1/package.json 61
+f ./system1/readme.txt 762
+
+
+{{END}}
+code_search->16 / 1421 - assistant: {{FROM:assistant TO:fs}}
+read_file ./system1/package.json
+{{END}}
+code_search->54 / 1492 - user: {{FROM:fs TO:assistant}}
+File ./system1/package.json contents:
+{
+  "dependencies": {
+    "create-react-app": "^5.0.1"
+  }
+}
+
+
+{{END}}
+code_search->17 / 1492 - assistant: {{FROM:assistant TO:fs}}
+read_file ./system1/readme.txt
+{{END}}
+code_search->185 / 1692 - user: {{FROM:fs TO:assistant}}
+File ./system1/readme.txt contents:
+Here is a high level project description:
+
+- system1/frontend: This is a directory that contains the frontend code for the application.
+- system1/backend: This is a directory that contains the backend code for the application.
+
+Frontend:
+- system1/frontend/index.html: This file contains the HTML code for the main page of the frontend.
+- system1/frontend/index.js: This file contains the JavaScript code for the main page of the frontend.
+- system1/frontend/App.js: This file contains the React code for the main application component.
+
+Backend:
+- system1/backend/setup.py: This file contains the setup script for the application, including the database schema and initial data.
+- system1/backend/app.py: This file contains the Python code for the application.
+
+
+{{END}}
+code_search->15 / 1692 - assistant: {{FROM:assistant TO:fs}}
+list_directory ./system1/backend
+{{END}}
+code_search->71 / 1780 - user: {{FROM:fs TO:assistant}}
+Directory ./system1/backend contents:
+f ./system1/backend/__init__.py 18
+d ./system1/backend/models
+f ./system1/backend/setup.py 173
+f ./system1/backend/app.py 1628
+
+
+{{END}}
+code_search->17 / 1780 - assistant: {{FROM:assistant TO:fs}}
+read_file ./system1/backend/app.py
+{{END}}
+code_search->394 / 2184 - user: {{FROM:fs TO:assistant}}
+File ./system1/backend/app.py contents:
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from models.user import User
+
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    user = User.query.filter_by(username=username).first()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({'message': 'Invalid username or password'}), 401
+        return jsonify({'message': 'Logged in successfully'}), 200
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required'}), 400
+    if User.query.filter_by(username=username).first():
+        return jsonify({'message': 'Username already exists'}), 400
+    user = User(username=username, password=generate_password_hash(password))
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'message': 'User created successfully'}), 201
+
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify([user.serialize() for user in users]), 200
+
+if __name__ == '__main__':
+    app.run(debug=True,port=5050)
+
+
+{{END}}
+code_search->10 / 2184 - assistant: {{FROM:assistant TO:user}}
+app.py
+{{END}}
+top_level->28 / 951 - user: {{FROM:code_search TO:assistant}}
+app.py
+{{END}}
+top_level->17 / 951 - assistant: {{FROM:assistant TO:file_system}}
+read /system1/backend/app.py
+{{END}}
+top_level->30 / 992 - user: {{FROM:system TO:assistant}}
+Unknown tool: file_system
+{{END}}
+top_level->11 / 992 - assistant: {{FROM:assistant TO:system}}
+list_tools
+{{END}}
+top_level->70 / 1077 - user: {{FROM:system TO:assistant}}
+Available tools:
+code_search: A tool for searching the code base. .
+fs: Provides tools for file and directory manipulation.
+system: Used to interact with the system.
+user: Used to send and receive messages to the user.
+
+{{END}}
+top_level->15 / 1077 - assistant: {{FROM:assistant TO:fs}}
+read system1/backend/app.py
+{{END}}
+top_level->29 / 1116 - user: {{FROM:fs TO:assistant}}
+Unknown command: read
+
+{{END}}
+top_level->10 / 1116 - assistant: {{FROM:assistant TO:fs}}
+help
+{{END}}
+top_level->169 / 1301 - user: {{FROM:fs TO:assistant}}
+The following commands are available in the fs tool:
+
+read_file filepath - reads the contents of the file
+write_file filepath
+           content - writes the content to the file, overwriting any existing content
+delete_file filepath - deletes the file
+create_directory filepath - creates a directory
+delete_directory filepath - deletes the directory
+list_directory filepath - lists the contents of the directory
+move_file filepath new_filepath - moves the file or directory to the new location, or renames it. 
+
+filepath is the raw path to the file or directory, without any aditional prefix.
+Glob patterns are not supported.
+To edit a file, you can read its contents first and then write the new contents back to the file.
+
+
+ 
+
+
+{{END}}
+top_level->16 / 1301 - assistant: {{FROM:assistant TO:fs}}
+read_file system1/backend/app.py
+{{END}}
+top_level->393 / 1708 - user: {{FROM:fs TO:assistant}}
+File system1/backend/app.py contents:
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from models.user import User
+
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    user = User.query.filter_by(username=username).first()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({'message': 'Invalid username or password'}), 401
+        return jsonify({'message': 'Logged in successfully'}), 200
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required'}), 400
+    if User.query.filter_by(username=username).first():
+        return jsonify({'message': 'Username already exists'}), 400
+    user = User(username=username, password=generate_password_hash(password))
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'message': 'User created successfully'}), 201
+
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify([user.serialize() for user in users]), 200
+
+if __name__ == '__main__':
+    app.run(debug=True,port=5050)
+
+
+{{END}}
+top_level->14 / 1708 - assistant: The login API call is handled in the '/api/login' route.{{END}}
+top_level->28 / 1763 - user: {{FROM:system TO:assistant}}
+Invalid message format
+{{END}}
+top_level->27 / 1763 - assistant: {{FROM:assistant TO:user}}
+I apologize for the mistake. The login API call is handled in the '/api/login' route.{{END}}
+top_level->27 / 1809 - user: {{FROM:user TO:assistant}}
+in which file?
+{{END}}
+top_level->19 / 1809 - assistant: {{FROM:assistant TO:code_search}}
+search /system1 -f "app.py"
+{{END}}
+code_search->33 / 2231 - user: {{FROM:user TO:assistant}}
+search /system1 -f "app.py"
+{{END}}
+code_search->14 / 2231 - assistant: {{FROM:assistant TO:fs}}
+list_directory /system1
+{{END}}
+code_search->47 / 2289 - user: {{FROM:fs TO:assistant}}
+Directory /system1 not found: [Errno 2] No such file or directory: '/system1'
+
+{{END}}
+code_search->11 / 2289 - assistant: {{FROM:assistant TO:fs}}
+list_directory .
+{{END}}
+code_search->33 / 2336 - user: {{FROM:fs TO:assistant}}
+Directory . contents:
+d ./system1
+
+
+{{END}}
+code_search->14 / 2336 - assistant: {{FROM:assistant TO:fs}}
+list_directory ./system1
+{{END}}
+code_search->72 / 2418 - user: {{FROM:fs TO:assistant}}
+Directory ./system1 contents:
+d ./system1/frontend
+d ./system1/backend
+f ./system1/package-lock.json 24280
+f ./system1/package.json 61
+f ./system1/readme.txt 762
+
+
+{{END}}
+code_search->10 / 2418 - assistant: {{FROM:assistant TO:user}}
+app.py
+{{END}}
+top_level->28 / 1858 - user: {{FROM:code_search TO:assistant}}
+app.py
+{{END}}
+top_level->21 / 1858 - assistant: {{FROM:assistant TO:user}}
+The login API call is handled in the 'app.py' file.{{END}}

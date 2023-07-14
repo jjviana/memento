@@ -1,6 +1,7 @@
 import subprocess
-
-shell = subprocess.Popen(["docker", "run", "-i", "mementosh"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+import os
+shell = subprocess.Popen(["/bin/bash"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         cwd="workspace")
 
 MAX_RESULT_LENGTH=256
 
@@ -47,6 +48,8 @@ def exec_commands(commands):
 # Loop to read a command from stdin, one command per line
 in_command = False
 commands=[]
+
+
 while True:
     command = input("")
     if command == "exit":

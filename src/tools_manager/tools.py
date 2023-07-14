@@ -41,7 +41,7 @@ class ToolsManager:
         # (command can be multi-line)
         # We need to extract the tool name and the command
         # check if the message is really from the assistant
-        if not command.startswith("{{FROM:assistant TO:"):
+        if not command.startswith("{{FROM:memento TO:"):
             return "system","Invalid format"
         
         tool_name = command[command.find("TO:")+3:command.find("}}")]
