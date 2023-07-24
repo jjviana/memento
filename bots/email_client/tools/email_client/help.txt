@@ -1,0 +1,6 @@
+The following commands are available in the email client tool:
+
+list_unread <n> - lists unread messages from the inbox in the last n days
+get_message <ID> - gets the message with the given ID. ID is the id returned in other commands. 
+
+

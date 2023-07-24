@@ -18,6 +18,8 @@ class Memento:
         self.model = model
         self.logger = logger
         self.model.set_gc_manager(self.manage_gc)
+        self.session_cost = 0.0
+        self.iteraction_costs = []
     
     def format_tool_output(self, tool_name, tool_output):
         return "{{FROM:"+tool_name+" TO:memento}}\n" + tool_output + "\n{{END}}"
@@ -33,12 +35,18 @@ class Memento:
         return self.process_response(response)
     
     def process_response(self,response:str) -> str:
-
+        interaction_cost = 0.0
         while True:
+            messages = self.model.get_messages()
+            response_cost = messages[-1].cost
+            interaction_cost = interaction_cost + response_cost
+        
             if response.startswith("{{FROM:memento TO:"):
                 tool_name,tool_output = self.tools_manager.process_command(response)
                 if tool_name == "user":
                     #self.check_update_memory()
+                    self.session_cost = self.session_cost + interaction_cost
+                    self.iteraction_costs.append(interaction_cost)
                     return tool_output
 
                 tool_output = self.format_tool_output(tool_name, tool_output)
@@ -47,7 +55,7 @@ class Memento:
                 if response == LoopDetector.LOOP_DETECTED_SENTINEL:
                     response = self.model.input(self.format_tool_output("system","You are repeating yourself. Please check for any error messages, check command syntax or try a different approach."))  
                 
-                response = self.model.input(self.format_tool_output("system"," You seem to have generated a message with an incorrect format. Please repeat the message with the format {{FROM:memento TO:<tool>}}<message>{{END}}"))
+                response = self.model.input(self.format_tool_output("system"," Your last message is not formatted correctly. Please repeat it with the correct format."))
 
     def manage_gc(self,model):
        
@@ -88,5 +96,8 @@ response = top_level_memento.start()
 
 while True:
     print(response)
+    iteraction_cost = "{:.6f}".format(top_level_memento.iteraction_costs[-1])
+    session_cost = "{:.6f}".format(top_level_memento.session_cost)
+    print(f"====\nIteraction cost: {iteraction_cost}\nSession cost: {session_cost}\n====")
     message = session.prompt(">")
     response = top_level_memento.process(message)

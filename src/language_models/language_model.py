@@ -8,6 +8,10 @@ class Message:
         self.role = role
         self.content = content
         self.tokens_used = 0
+        self.total_prompt_tokens = 0
+        self.total_completion_tokens = 0
+        self.cost = 0.0
+        
 
     def __str__(self):
         return f"{self.role}: {self.content}"
@@ -20,7 +24,8 @@ class Message:
             "role": self.role,
             "content": self.content
         }
-    
+
+
 class LanguageModel(ABC):
 
     @abstractmethod

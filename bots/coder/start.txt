@@ -1,11 +1,10 @@
 ${include:toolsmith.txt}
 
-Your main function as an agent is to assist the user in a coding project.
-A few important facts about the projet:
-- The project is called "yelb" and is in the "yelb" directory.
+Your main function as an agent is to assist the user in coding projects.
 
 Your first tasks are:
 -  send a list_tools message to system to discover what tools are available
 -  send a message to the user presenting yourself, and then wait for further instructions.
+
 
 

@@ -7,7 +7,7 @@ import time
 class GPT_35(LanguageModel):
 
     def model_name(self) -> str:
-        return "gpt-3.5-turbo"
+        return "gpt-3.5-turbo-16k"
 
     def __init__(self, api_key: str,logger: Callable = None) -> None:
         openai.api_key = api_key
@@ -18,8 +18,11 @@ class GPT_35(LanguageModel):
         
 
     def _logMessage(self, message: Message,total_tokens_used: int):
+
+        # format message cost with 6 digits
+        cost = "{:.6f}".format(message.cost)
         if self.logger:
-            self.logger(f"{message.tokens_used} / {total_tokens_used} - {message}")
+            self.logger(f"{message.tokens_used} / {total_tokens_used}- {cost} - {message}")
 
     
     def _log(self,rawMessage: str):
@@ -65,12 +68,28 @@ class GPT_35(LanguageModel):
       
         response_message = Message("assistant", response)
         response_message.tokens_used = completion_tokens
+        response_message.total_prompt_tokens = prompt_tokens
+        response_message.total_completion_tokens = completion_tokens
+        response_message.cost = self.compute_cost(prompt_tokens,completion_tokens)
         messages.append(response_message)
         total_tokens_used = prompt_tokens + completion_tokens
         self._logMessage(messages[-2],total_tokens_used)
         self._logMessage(messages[-1],total_tokens_used)
         self.messages = messages
         return response
+
+    def compute_cost(self,prompt_tokens,completion_tokens):
+        prompt_tokens_float = float(prompt_tokens)/1000.0
+        completion_tokens_float = float(completion_tokens)/1000.0
+
+        if self.model_name() == "gpt-3.5-turbo":
+            return prompt_tokens_float*0.00015+completion_tokens_float*0.0002
+        elif self.model_name() == "gpt-3.5-turbo-16k":
+            return prompt_tokens_float*0.0003+completion_tokens_float*0.0004
+        elif self.model_name() == "gpt-4":
+            return prompt_tokens_float*0.03+completion_tokens_float*0.06
+        else:
+            raise Exception(f"Unknown model name: {self.model_name()}")
 
     def input(self, prompt: str) -> str:
         return self._chat_send(prompt)
@@ -81,7 +100,7 @@ class GPT_35(LanguageModel):
                 completion = openai.ChatCompletion.create(
                     model=self.model_name(),
                     messages=self._format_messages(),
-                    temperature=0.0,
+                    temperature=1.0,
                     stop=self.end_marker)
                 if completion.choices[0].finish_reason != "stop":
                     self._log("Max token count exceeded(finish_reason) - Triggering GC")

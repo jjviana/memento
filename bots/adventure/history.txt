@@ -1,0 +1,69 @@
+
+# 2023-07-17 21:31:13.452881
++I sit on the chair
+
+# 2023-07-17 21:32:07.742018
++I get out of the chair and look if there is anything bellow it.
+
+# 2023-07-17 21:32:46.825191
++I ick up the note and read it.
+
+# 2023-07-17 21:33:08.671674
++I put the note on the chair
+
+# 2023-07-17 21:33:37.482174
++I set the chair on fire.
+
+# 2023-07-17 21:36:43.642201
++I sit on the chair
+
+# 2023-07-17 21:36:56.477642
++I rock back and forth
+
+# 2023-07-17 21:38:03.032956
++Describe the scene for me
+
+# 2023-07-17 21:38:23.452303
++I pick up the note
+
+# 2023-07-17 21:41:03.034012
++I sit on the chair
+
+# 2023-07-17 21:41:17.107760
++I rock back and forth
+
+# 2023-07-17 21:41:55.315743
++I lift the chair cushion
+
+# 2023-07-21 15:25:15.436324
++I sit on the chair
+
+# 2023-07-21 15:25:35.510136
++I rock the chair
+
+# 2023-07-21 15:25:50.168313
++I rock the chair again
+
+# 2023-07-21 15:26:35.179560
++I look beneath the chair
+
+# 2023-07-21 15:31:35.022061
++I try to unlock the computer
+
+# 2023-07-21 15:31:50.436551
++I sit on the chair
+
+# 2023-07-21 15:32:14.531438
++I type the password '12345' on the computer
+
+# 2023-07-21 15:32:26.008224
++I rock the chair
+
+# 2023-07-21 15:33:04.481203
++I type the password 'password' on the computer
+
+# 2023-07-21 15:33:16.837828
++I rock the chair again
+
+# 2023-07-21 15:33:44.012842
++try the password on the computer

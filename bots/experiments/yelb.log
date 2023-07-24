@@ -1,0 +1,42 @@
+Hello, I am Memento, your AI assistant. I am here to assist you with your coding project. Please provide me with your instructions.
+>Please look into the source code of the application, and write a developer description of its overall architecture, the main folders and their function and any other
+facts you think can help a new developer to work on this system. Ignore all of the pdf and rft, files, look at source code only.
+The Yelb application is organized into several directories, each with a specific purpose:
+
+1. yelb-ui: This directory contains the user interface of the application. It includes a Dockerfile for containerization and a startup.sh script for initialization.
+
+2. yelb-appserver: This directory contains the application server of Yelb. It includes several Ruby scripts for different functionalities (restaurant_adapter.rb, hostname_adapter.rb, pageviews_adapter.rb, getstats_adapter.rb, yelb-appserver.rb, getvotes_adapter.rb), a Dockerfile, a Gemfile for Ruby dependencies, and a startup.sh script.
+
+3. yelb-db: This directory contains the database of Yelb. It includes a Dockerfile and an initialization script (init-yelb-db.sh).
+
+4. deployments: This directory contains scripts and configurations for different deployment environments. It includes:
+   - platformdeployment: Contains subdirectories for different platforms (Docker, Linux, AWS, Kubernetes).
+   - localdevelopment: Contains a script for setting up the development environment (setupdevenv.sh).
+   - localtest: Contains a docker-compose.yaml file for local testing.
+
+Please note that this is a high-level overview of the application's architecture. For a more detailed understanding, I recommend going through the source code in each directory.
+>What is the purpose of the application?
+The Yelb application is a simple web application developed by Massimo Re Ferre'. The application's main component is the yelb-appserver.rb, a Ruby-based app that connects to a backend database for persistency.
+
+The application uses several modules for different functionalities:
+- Pageviews: Likely used for tracking the number of page views.
+- Getvotes: Likely used for retrieving votes from users.
+- Restaurant: Likely used for managing restaurant data.
+- Hostname: Likely used for managing hostnames.
+- Getstats: Likely used for retrieving statistics.
+- Restaurantsdbupdate: Likely used for updating the restaurant database.
+- Restaurantsdbread: Likely used for reading from the restaurant database.
+
+The application can be configured for different environments (production, test, development) with different settings for each environment.
+
+Please note that this is a high-level overview based on the source code. For a more detailed understanding, I recommend going through the source code in each module.
+>what kind of restaurant data is managed by the application?
+The Yelb application manages restaurant data in terms of a count associated with each restaurant. This count is stored in a database and can be updated and read.
+
+The restaurant data is managed by several Ruby scripts:
+- restaurant_adapter.rb: This script uses the restaurant module to update the count of a specific restaurant.
+- restaurant.rb: This script uses the restaurantsdbread and restaurantsdbupdate modules to update and read the count of a specific restaurant.
+- restaurantsdbread.rb: This script reads the count of a specific restaurant from the database. It can read from a DynamoDB table or a PostgreSQL database.
+- restaurantsdbupdate.rb: This script updates the count of a specific restaurant in the database. It can update a DynamoDB table or a PostgreSQL database.
+
+The count likely represents some form of user interaction with the restaurant in the application, such as votes or visits.

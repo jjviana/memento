@@ -1,0 +1,78 @@
+
+# 2023-07-21 16:32:25.917298
++hi! do I have any important unread email?
+
+# 2023-07-21 16:36:03.214652
++is there anything fro mmy bank?
+
+# 2023-07-21 16:36:17.368159
++yes
+
+# 2023-07-21 16:38:47.586568
++is there anything from my bank?
+
+# 2023-07-21 16:39:01.125734
++yes
+
+# 2023-07-21 17:05:40.047108
++any messages from my bank?
+
+# 2023-07-21 17:06:11.497491
++is there anything from my bank?
+
+# 2023-07-21 17:07:02.039180
++ok
+
+# 2023-07-21 17:07:21.319972
++read this message
+
+# 2023-07-21 17:08:25.815759
++is there anything from my bank?
+
+# 2023-07-21 17:09:08.461382
++read it
+
+# 2023-07-21 17:14:54.128451
++read me any messages from scotiabank
+
+# 2023-07-21 17:15:23.412073
++read the first one
+
+# 2023-07-21 17:17:29.325039
++this does not seem to be the correct one
+
+# 2023-07-21 17:17:34.290073
++ok
+
+# 2023-07-21 17:18:39.895106
++please list the unread messages organized by topic
+
+# 2023-07-21 17:20:41.844827
++read message 1`5
+
+# 2023-07-21 17:22:02.998052
++is there anything on my unread messages about FedNow?
+
+# 2023-07-21 17:23:02.260536
++please list the unread messages organized by topic
+
+# 2023-07-21 17:24:14.420029
++read the hacker news email and summarize it for me
+
+# 2023-07-21 17:26:03.169414
++please list the unread messages organized by topic
+
+# 2023-07-21 17:27:20.494330
++did you find any message from hacker news?
+
+# 2023-07-21 17:28:22.986577
++please summarize this entire message for me
+
+# 2023-07-21 17:29:03.013491
++open the link 5
+
+# 2023-07-21 17:30:02.115429
++please list the unread messages organized by the following topics: Tech, Finance, Promotions, Other
+
+# 2023-07-21 17:31:07.926000
++please include all of the messages, there are some missing
