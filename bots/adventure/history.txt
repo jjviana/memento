@@ -67,3 +67,36 @@
 
 # 2023-07-21 15:33:44.012842
 +try the password on the computer
+
+# 2023-09-29 18:30:56.518471
++Try to unlock the computer
+
+# 2023-09-29 18:31:27.552668
++I sit on the chair
+
+# 2023-09-29 18:31:51.083074
++Rock the chair
+
+# 2023-09-29 18:32:05.300341
++rock the chair again
+
+# 2023-09-29 18:32:42.243759
++pick up the piece of paper
+
+# 2023-09-29 18:35:11.665215
++type the password 12345 on the computer
+
+# 2023-09-29 18:35:54.556174
++ask the chair what is in the piece of paper that fell
+
+# 2023-09-29 18:39:56.797178
++Kick the chair
+
+# 2023-09-29 18:40:18.154774
++Sit on the chair and rock 3 times
+
+# 2023-09-29 18:45:03.800655
++pick up the piece of paper
+
+# 2023-09-29 18:45:35.770659
++Yes, pick up the piece of paper that fell from the chair

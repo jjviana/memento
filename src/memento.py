@@ -3,13 +3,14 @@ import openai
 from prompt_toolkit import prompt
 from settings import Settings
 from prompts import PromptsManager
-from language_models import GPT_35
+from language_models import GPT_35,BedrockClaude
 from language_models import LoopDetector
 from language_models import Message
 from language_models import OpenAIEmbeddingModel
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from tools_manager import ToolsManager
+import argparse
 
 class Memento:
     def __init__(self, tools_manager, prompts_manager,model,logger):
@@ -35,8 +36,10 @@ class Memento:
         return self.process_response(response)
     
     def process_response(self,response:str) -> str:
+
         interaction_cost = 0.0
         while True:
+            response = response.lstrip()
             messages = self.model.get_messages()
             response_cost = messages[-1].cost
             interaction_cost = interaction_cost + response_cost
@@ -51,53 +54,68 @@ class Memento:
 
                 tool_output = self.format_tool_output(tool_name, tool_output)
                 response = self.model.input(tool_output)
+
             else:
                 if response == LoopDetector.LOOP_DETECTED_SENTINEL:
                     response = self.model.input(self.format_tool_output("system","You are repeating yourself. Please check for any error messages, check command syntax or try a different approach."))  
-                
-                response = self.model.input(self.format_tool_output("system"," Your last message is not formatted correctly. Please repeat it with the correct format."))
+                else:
+                    print(f"Invalid response:-{response}")
+                    response = self.model.input(self.format_tool_output("system"," Your last message is not formatted correctly. Please repeat it with the correct format."))
 
     def manage_gc(self,model):
        
         raise NotImplementedError("Maximum tokens used.")
 
     
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    # Model type must be OpenAI or BedrockClaude
+    parser.add_argument("--model", type=str, required=True, help="Model type")
 
-            
-settings = Settings()
-api_key = settings.get("openai_api_key")
-if api_key is None or api_key == "":
-    openai.api_key = prompt("Please enter your OpenAI API key: ")
-    settings.set("openai_api_key", openai.api_key)
+    language_model_factory = None
+    if parser.parse_args().model == "OpenAI":
+        settings = Settings()
+        api_key = settings.get("openai_api_key")
+        if api_key is None or api_key == "":
+            openai.api_key = prompt("Please enter your OpenAI API key: ")
+            settings.set("openai_api_key", openai.api_key)
+        def gpt_35_factory(logger):
+            return GPT_35(api_key,logger)
+        language_model_factory = gpt_35_factory
 
-session = PromptSession(history=FileHistory("history.txt"))
+    elif parser.parse_args().model == "BedrockClaude":
+        def bedrock_claude_factory(logger):
+            return BedrockClaude("anthropic.claude-v2",logger)
+        language_model_factory = bedrock_claude_factory
+    else:
+        raise ValueError("Model type must be OpenAI or BedrockClaude")
+
+    session = PromptSession(history=FileHistory("history.txt"))
+
+    log_file= open("memento.log", "a")
+    def log(message: str):
+        log_file.write(message + "\n")
+        log_file.flush()
+    def logger(instance: str):
+        return lambda message: log(instance+"->"+message)
+
+    prompts_manager = PromptsManager(".")
+
+    def new_memento(tools_manager,prompts_manager,instance: str):
+        model = LoopDetector(language_model_factory(logger(instance)))
+        return Memento(tools_manager,prompts_manager,model,logger(instance))
 
 
-log_file= open("memento.log", "a") 
-def log(message: str):
-    log_file.write(message + "\n")
-    log_file.flush()
-def logger(instance: str):
-    return lambda message: log(instance+"->"+message)
-
-prompts_manager = PromptsManager(".")
-embedding_model = OpenAIEmbeddingModel(api_key)
-
-def new_memento(tools_manager,prompts_manager,instance: str):
-    model = LoopDetector(GPT_35(api_key,logger(instance)))
-    return Memento(tools_manager,prompts_manager,model,logger(instance))
-    
-
-tools_manager = ToolsManager("tools",new_memento)
+    tools_manager = ToolsManager("tools",new_memento)
 
 
-top_level_memento = new_memento(tools_manager,prompts_manager,"top_level")
-response = top_level_memento.start()
+    top_level_memento = new_memento(tools_manager,prompts_manager,"top_level")
+    response = top_level_memento.start()
 
-while True:
-    print(response)
-    iteraction_cost = "{:.6f}".format(top_level_memento.iteraction_costs[-1])
-    session_cost = "{:.6f}".format(top_level_memento.session_cost)
-    print(f"====\nIteraction cost: {iteraction_cost}\nSession cost: {session_cost}\n====")
-    message = session.prompt(">")
-    response = top_level_memento.process(message)
+    while True:
+        print(response)
+        iteraction_cost = "{:.6f}".format(top_level_memento.iteraction_costs[-1])
+        session_cost = "{:.6f}".format(top_level_memento.session_cost)
+        print(f"====\nIteraction cost: {iteraction_cost}\nSession cost: {session_cost}\n====")
+        message = session.prompt(">")
+        response = top_level_memento.process(message)

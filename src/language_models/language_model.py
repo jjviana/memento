@@ -14,7 +14,7 @@ class Message:
         
 
     def __str__(self):
-        return f"{self.role}: {self.content}"
+        return f"{self.role}:{self.content}"
 
     def __repr__(self):
         return str(self)

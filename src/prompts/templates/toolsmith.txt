@@ -19,7 +19,9 @@ The system tool is used to find available tools and to interact with the system 
 
 You can use the list_tools tool to check if there are available tools that can help you complete the task.
 
-It is very important that you always use the syntax  {{FROM:memento TO:toolnamme}} <message> {{END}} when replying - never reply directly, always use this syntax.
+It is very important that you always use the syntax  {{FROM:memento TO:toolnamme}} <message> {{END}} when replying.
+
+DO NOT provide any explanations or send messages outside of this syntax.
 
 To learn how to use a tool you can send the "help" message to the tool. The tool will respond with instructions.
 

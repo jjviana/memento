@@ -76,3 +76,42 @@
 
 # 2023-07-21 17:31:07.926000
 +please include all of the messages, there are some missing
+
+# 2023-09-29 19:35:56.714049
++what is in my inbox right now that doesn't look like a promotion?
+
+# 2023-09-29 19:38:44.341499
++what is in my inbox today that doesn't look like a promotion?
+
+# 2023-09-29 19:41:14.718467
++what are the telus roaming emails about?
+
+# 2023-09-29 19:42:08.455845
++what about the Mirvish email?
+
+# 2023-09-29 19:43:22.378522
++can you translate Ana's emails to English please?
+
+# 2023-09-29 19:44:46.049088
++Please list the messages I got today, grouped by topic
+
+# 2023-09-29 19:46:07.542919
++I meant you should list the messages and then group them by topics that make common sense
+
+# 2023-09-29 19:47:00.547219
++I guess you tried t osend a nestes message. In general do not reply outside of the message boundaries. 
+
+# 2023-09-29 19:48:07.577894
++Please list the messages I got today, grouped by topic. Chose a topic list thae makes common sense.
+
+# 2023-09-29 19:50:59.823730
++what is the Emu image model by Meta?
+
+# 2023-09-29 19:51:33.509159
++I don't have the message id - you should have it in your history
+
+# 2023-09-29 19:55:13.339094
++thanks!. A new question: according to my inbox, which movies should I watch this weekend?
+
+# 2023-09-29 19:55:44.541113
++Can you read both emails and summarize them for me?
