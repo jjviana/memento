@@ -1,8 +1,10 @@
+import os
 from typing import Callable
 
 import boto3
 import json
 from .language_model import LanguageModel, Message
+import tokenizers
 
 
 # A LLM implementation on top of Amazon Bedrock using the Claude model
@@ -17,6 +19,15 @@ class BedrockClaude(LanguageModel):
         self.content_type = 'application/json'
         self.logger = logger
         self.gc_manager = None
+
+        # Load the tokenizer from the file claude_tokenizer.json that is located in the
+        # same directory as this file
+        dir = os.path.dirname(__file__)
+        tokenizer_file = os.path.join(dir, 'claude_tokenizer.json')
+        self.tokenizer = tokenizers.Tokenizer.from_file(tokenizer_file)
+        
+    def count_tokens(self, text: str) -> int:
+        return len(self.tokenizer.encode(text).ids)
 
     def initial_prompt(self, prompt: str, need_reply=True) -> str:
         message = Message("user", prompt)
@@ -33,8 +44,10 @@ class BedrockClaude(LanguageModel):
         else:
             messages.append(message)
 
+        prompt = self.format_prompt()
+        promot_token_count = self.count_tokens(prompt)
         body = json.dumps({
-            "prompt": self.format_prompt(),
+            "prompt": prompt,
             "max_tokens_to_sample": 8191,
             "temperature": 1.0,
             "top_p": 0.9,
@@ -48,10 +61,27 @@ class BedrockClaude(LanguageModel):
         stop_reason = response_body['stop_reason']
         if stop_reason != "stop_sequence":
             raise Exception(f"Unexpected model stop reason: {stop_reason}")
+        completion_token_count = self.count_tokens(completion)
         completion = completion + self.end_marker
-        self.messages.append(Message("assistant", completion))
-        self._log_message(messages[-2])
-        self._log_message(messages[-1])
+
+        if len(messages)>=2 and messages[-2].tokens_used == 0:
+            # Can happen sometimes -  Fill in tokens used now.
+            messages[-2].tokens_used = promot_token_count
+
+        tokens_used_before = sum([m.tokens_used for m in messages])
+        self.messages[-1].tokens_used = promot_token_count - tokens_used_before
+
+        response_message = Message("assistant", completion)
+        response_message.tokens_used = completion_token_count
+        response_message.total_prompt_tokens = promot_token_count
+        response_message.total_completion_tokens = completion_token_count
+        response_message.cost = self.compute_cost(promot_token_count,completion_token_count)
+        self.messages.append(response_message)
+
+        total_tokens_used = promot_token_count + completion_token_count
+
+        self._logMessage(messages[-2],total_tokens_used)
+        self._logMessage(messages[-1],total_tokens_used)
         return completion
 
     def format_prompt(self) -> str:
@@ -67,10 +97,21 @@ class BedrockClaude(LanguageModel):
         return prompt
 
 
-    def _log_message(self, message: Message):
-        if self.logger:
-            self.logger(f"{message}")
+    def _logMessage(self, message: Message,total_tokens_used: int):
 
+        # format message cost with 6 digits
+        cost = "{:.6f}".format(message.cost)
+        if self.logger:
+            self.logger(f"{message.tokens_used} / {total_tokens_used}- {cost} - {message}")
+
+
+    def compute_cost(self,prompt_tokens,completion_tokens):
+        prompt_tokens_float = float(prompt_tokens)/1000.0
+        completion_tokens_float = float(completion_tokens)/1000.0
+
+        return prompt_tokens_float*0.01102+completion_tokens_float*0.03268
+       
+        
     def input(self, prompt: str) -> str:
         return self._chat_send(prompt)
 

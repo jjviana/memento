@@ -100,3 +100,36 @@
 
 # 2023-09-29 18:45:35.770659
 +Yes, pick up the piece of paper that fell from the chair
+
+# 2023-10-01 15:42:37.918504
++I try to unlock the computer
+
+# 2023-10-01 15:43:03.153915
++I kick the chair
+
+# 2023-10-01 15:43:31.147787
++I sit on the chair
+
+# 2023-10-01 15:43:50.301902
++I rock back and forth 3 times
+
+# 2023-10-01 15:44:26.051163
++yes
+
+# 2023-10-01 15:45:22.465365
++can you ask the chair of the note said something about a password?
+
+# 2023-10-01 15:46:10.699253
++I try unlocking the computer with the password
+
+# 2023-10-01 18:08:36.857675
++Inspect the chair
+
+# 2023-10-01 18:20:16.661757
++I sit on the chair
+
+# 2023-10-01 18:20:57.321699
++I keep rocking the chair
+
+# 2023-10-01 18:22:27.248171
++I think you can just pretend you read it

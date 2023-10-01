@@ -3,15 +3,14 @@ import openai
 from prompt_toolkit import prompt
 from settings import Settings
 from prompts import PromptsManager
-from language_models import GPT_35,BedrockClaude
+from language_models import OpenAIChat,BedrockClaude
 from language_models import LoopDetector
 from language_models import Message
-from language_models import OpenAIEmbeddingModel
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from tools_manager import ToolsManager
 import argparse
-
+from exceptions import exception_handler
 class Memento:
     def __init__(self, tools_manager, prompts_manager,model,logger):
         self.tools_manager = tools_manager
@@ -39,6 +38,7 @@ class Memento:
 
         interaction_cost = 0.0
         while True:
+            # Some models tend to return a response with leading whitespace
             response = response.lstrip()
             messages = self.model.get_messages()
             response_cost = messages[-1].cost
@@ -47,7 +47,6 @@ class Memento:
             if response.startswith("{{FROM:memento TO:"):
                 tool_name,tool_output = self.tools_manager.process_command(response)
                 if tool_name == "user":
-                    #self.check_update_memory()
                     self.session_cost = self.session_cost + interaction_cost
                     self.iteraction_costs.append(interaction_cost)
                     return tool_output
@@ -69,26 +68,18 @@ class Memento:
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    # Model type must be OpenAI or BedrockClaude
-    parser.add_argument("--model", type=str, required=True, help="Model type")
+
+    available_models = ["gpt-3.5-turbo","gpt-3.5-turbo-16k","gpt-4","anthropic.claude-v2"]
+    parser.add_argument("--model", type=str, required=True, help=f"Model type. Available models: {available_models}")
 
     language_model_factory = None
-    if parser.parse_args().model == "OpenAI":
-        settings = Settings()
-        api_key = settings.get("openai_api_key")
-        if api_key is None or api_key == "":
-            openai.api_key = prompt("Please enter your OpenAI API key: ")
-            settings.set("openai_api_key", openai.api_key)
-        def gpt_35_factory(logger):
-            return GPT_35(api_key,logger)
-        language_model_factory = gpt_35_factory
-
-    elif parser.parse_args().model == "BedrockClaude":
-        def bedrock_claude_factory(logger):
-            return BedrockClaude("anthropic.claude-v2",logger)
-        language_model_factory = bedrock_claude_factory
+    args = parser.parse_args()
+    if args.model.startswith("gpt-"):
+        language_model_factory =lambda logger: OpenAIChat(args.model,logger)
+    elif args.model == "anthropic.claude-v2":
+        language_model_factory = lambda logger: BedrockClaude("anthropic.claude-v2",logger)
     else:
-        raise ValueError("Model type must be OpenAI or BedrockClaude")
+        raise ValueError(f"Unknown model: {args.model}")
 
     session = PromptSession(history=FileHistory("history.txt"))
 
@@ -101,21 +92,31 @@ if __name__ == "__main__":
 
     prompts_manager = PromptsManager(".")
 
-    def new_memento(tools_manager,prompts_manager,instance: str):
+    all_agents = []
+    agent_session_costs =[]
+
+    def new_agent(tools_manager,prompts_manager,instance: str):
         model = LoopDetector(language_model_factory(logger(instance)))
-        return Memento(tools_manager,prompts_manager,model,logger(instance))
+        agent = Memento(tools_manager,prompts_manager,model,logger(instance))
+        all_agents.append(agent)
+        agent_session_costs.append(0.0)
+        return agent
 
 
-    tools_manager = ToolsManager("tools",new_memento)
+    tools_manager = ToolsManager("tools",new_agent)
 
 
-    top_level_memento = new_memento(tools_manager,prompts_manager,"top_level")
-    response = top_level_memento.start()
+    top_level_agent = new_agent(tools_manager,prompts_manager,"top_level")
+    response = top_level_agent.start()
 
     while True:
         print(response)
-        iteraction_cost = "{:.6f}".format(top_level_memento.iteraction_costs[-1])
-        session_cost = "{:.6f}".format(top_level_memento.session_cost)
+        interaction_costs = [all_agents[i].session_cost - agent_session_costs[i] for i in range(0,len(all_agents))]
+        agent_session_costs = [all_agents[i].session_cost for i in range(0,len(all_agents))]
+        total_iteraction_cost = sum(interaction_costs)
+        total_session_cost = sum(agent_session_costs)
+        iteraction_cost = "{:.6f}".format(total_iteraction_cost)
+        session_cost = "{:.6f}".format(total_session_cost)
         print(f"====\nIteraction cost: {iteraction_cost}\nSession cost: {session_cost}\n====")
         message = session.prompt(">")
-        response = top_level_memento.process(message)
+        response = top_level_agent.process(message)

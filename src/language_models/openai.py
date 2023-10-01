@@ -3,14 +3,22 @@ import openai
 import datetime
 from typing import Callable
 import time
-    
-class GPT_35(LanguageModel):
+import os
+from exceptions import ModelInitializationException
+from openai.error import AuthenticationError
+
+class OpenAIChat(LanguageModel):
 
     def model_name(self) -> str:
-        return "gpt-3.5-turbo-16k"
+        return self.model_name
 
-    def __init__(self, api_key: str,logger: Callable = None) -> None:
+    def __init__(self,model_name: str,logger: Callable = None) -> None:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if api_key is None:
+            raise ModelInitializationException("OPENAI_API_KEY environment variable must be set")
+        
         openai.api_key = api_key
+        self.model_name = model_name
         self.logger = logger
         self.gc_manager =None
         self.messages = []
@@ -82,14 +90,14 @@ class GPT_35(LanguageModel):
         prompt_tokens_float = float(prompt_tokens)/1000.0
         completion_tokens_float = float(completion_tokens)/1000.0
 
-        if self.model_name() == "gpt-3.5-turbo":
+        if self.model_name== "gpt-3.5-turbo":
             return prompt_tokens_float*0.00015+completion_tokens_float*0.0002
-        elif self.model_name() == "gpt-3.5-turbo-16k":
+        elif self.model_name == "gpt-3.5-turbo-16k":
             return prompt_tokens_float*0.0003+completion_tokens_float*0.0004
-        elif self.model_name() == "gpt-4":
+        elif self.model_name == "gpt-4":
             return prompt_tokens_float*0.03+completion_tokens_float*0.06
         else:
-            raise Exception(f"Unknown model name: {self.model_name()}")
+            raise Exception(f"Unknown model name: {self.model_name}")
 
     def input(self, prompt: str) -> str:
         return self._chat_send(prompt)
@@ -98,7 +106,7 @@ class GPT_35(LanguageModel):
         for i in range (0, 10):
             try:
                 completion = openai.ChatCompletion.create(
-                    model=self.model_name(),
+                    model=self.model_name,
                     messages=self._format_messages(),
                     temperature=1.0,
                     stop=self.end_marker)
@@ -106,12 +114,14 @@ class GPT_35(LanguageModel):
                     self._log("Max token count exceeded(finish_reason) - Triggering GC")
                     self._gc()
                 else:
-                    return completion     
+                    return completion 
+            except AuthenticationError as e:
+                raise ModelInitializationException("Invalid openai api key")
             except Exception as e:
                 if "maximum context length" in str(e):
                     self._log("Max token count exceeded(exception) - Triggering GC")
                     self._gc()
-                elif "You can retry your request" in str(e) or "Rate limit":
+                elif "You can retry your request" in str(e) or "Rate limit" in str(e):
                     self._log("Rate limit exceeded - pausing for 5 seconds")
                     time.sleep(5)
                 else:
