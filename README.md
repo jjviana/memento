@@ -1,5 +1,3 @@
-Here is my attempt at rewriting the README in a more natural way:
-
 # Memento
 
 Memento is a framework for building AI agents that can complete complex tasks by combining simple modular skills. The goal is to create assistants that understand natural language, break down requests, and leverage existing tools to satisfy user needs.
