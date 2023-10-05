@@ -2,6 +2,13 @@
 
 Memento is a framework that enables the creation of AI agents that can autonomously discover and use tools to fulfill complex user requests. Far from being a production-ready system, it is a research tool for investigating the possibilities and limitations os the current generation of Large Language Models for planning, reasoning, and comprehension. 
 
+## Summary of current findings (last update: October/2023)
+
+- Memento supports OpenAI models (GPT-3.5, GPT-3.5-16k, GPT-4) and Anthropic Claude running on Amazon Bedrock.
+- GPT-3.5 can accomplish simple tasks but gets confused easily if left to work autonomously.
+- GPT-4 and Claude are both capable of completing much more complex tasks that involve planning, reasoning and multiple environment interaction rounds. 
+
+
 ## Background
 
 The name Memento comes from the Christopher Nolan movie [Memento](https://en.wikipedia.org/wiki/Memento_(film)), where the main character uses notes to self in order to overcome his short-term memory loss. This only works because he breaks down his goals into smaller tasks that can be completed with the help of his notes, and then updates the notes as he goes along.
@@ -88,3 +95,4 @@ To run an agent:
 - Run `python memento.py --model <model_id>`
 
 Use `--help` for a list of available models.
+
