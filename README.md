@@ -48,14 +48,14 @@ The agent itself is identified by the entity id 'memento'. All the other entitie
 - *user*: enables the agent to send and receive messages from the user
 - *system*: enables the agent to send and receive messages to the system.
 
-The system tool implements a simple directory of tools, that the agent can discover by sending the *list_tools* command. This provides the agent with an initial list of tools and corresponding short descriptions. The agent can also send the *system* a message with the format help *tool* in order to obtain detailed help about how to use a specific tool. 
 
 ## Tools 
 
-All interaction of the agent
+All interaction of the agent with the environment happens through tools. Tools can be of two types:
 
-- **Subprocess tools** are simple scripts or programs that provide a single skill. They connect to the agent via a simple messaging protocol.
-- **Subordinate agents** are Memento agents that have their own prompt. They are run in the same process as the main agent and managed by the same class as the top-level agent. 
+- **Subprocess tools** are simple scripts or programs that provide a single skill. They connect to the agent via a simple messaging protocol. Subprocess tools implement a protocol that uses stdin/stdout to get requests and provide responses to the agent. 
+
+- **Subordinate agents** are Memento agents that have their own prompt. They execute in the same process as the main agent and managed by the same class as the top-level agent. 
  
 The protocol between agent and tools is defined in the toolsmith prompt. It is a simple text-based protocol that enable the agent to send and receive messages.
 
@@ -71,7 +71,11 @@ Team meeting 10am Monday
 {{END}} 
 ```
 
-Subprocess tools implement a protocol that uses stdin/stdout to get requests and provide responses to the agent. 
+The system tool implements a simple directory of tools, that the agent can discover by sending the *list_tools* command. This provides the agent with an initial list of tools and corresponding short descriptions. The agent can also send the *system* a message with the format help *tool* in order to obtain detailed help about how to use a specific tool. 
+
+The user tool is used by the agent to send messages to the user. Messages from the user appear to the agent as if they were sent by the user tool.
+
+
 
 ## Usage
 
