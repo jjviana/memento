@@ -11,6 +11,7 @@ from prompt_toolkit.history import FileHistory
 from tools_manager import ToolsManager
 import argparse
 from exceptions import exception_handler
+from protocol import EmbeddedMessage,parse_message
 class Memento:
     def __init__(self, tools_manager, prompts_manager,model,logger):
         self.tools_manager = tools_manager
@@ -39,27 +40,37 @@ class Memento:
         interaction_cost = 0.0
         while True:
             # Some models tend to return a response with leading whitespace
-            response = response.lstrip()
             messages = self.model.get_messages()
             response_cost = messages[-1].cost
             interaction_cost = interaction_cost + response_cost
-        
-            if response.startswith("{{FROM:memento TO:"):
-                tool_name,tool_output = self.tools_manager.process_command(response)
-                if tool_name == "user":
-                    self.session_cost = self.session_cost + interaction_cost
-                    self.iteraction_costs.append(interaction_cost)
-                    return tool_output
 
-                tool_output = self.format_tool_output(tool_name, tool_output)
-                response = self.model.input(tool_output)
-
-            else:
+            embedded_messages = []
+            try:
+                embedded_messages = parse_message(response)
+            except Exception as e:
                 if response == LoopDetector.LOOP_DETECTED_SENTINEL:
                     response = self.model.input(self.format_tool_output("system","You are repeating yourself. Please check for any error messages, check command syntax or try a different approach."))  
-                else:
-                    print(f"Invalid response:-{response}")
-                    response = self.model.input(self.format_tool_output("system"," Your last message is not formatted correctly. Please repeat it with the correct format."))
+                    continue
+                # Some agents tend to respond without the proper formatting.
+                # Usually this happens when formatting a response to the user
+                # (the prompt doesn't always override the model tendency to reply directly)
+                # In this case we will cheat and format the message as if the agent sent the 
+                # message to the user.
+                response = f"{{FROM:memento TO:user}}{response}{{END}}"
+                embedded_messages = parse_message(response)
+
+            # If for some reason the agent sends more than one embedded response message 
+            # (shouldn't happen given generation stop condition) 
+            # we will consider just the first one.
+            embedded_message = embedded_messages[0]
+            tool_name,tool_output = self.tools_manager.process_command(embedded_message.message)
+            if tool_name == "user":
+                self.session_cost = self.session_cost + interaction_cost
+                self.iteraction_costs.append(interaction_cost)
+                return tool_output
+
+            tool_output = self.format_tool_output(tool_name, tool_output)
+            response = self.model.input(tool_output)
 
     def manage_gc(self,model):
        

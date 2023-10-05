@@ -49,7 +49,7 @@ class BedrockClaude(LanguageModel):
         body = json.dumps({
             "prompt": prompt,
             "max_tokens_to_sample": 8191,
-            "temperature": 1.0,
+            "temperature": 0.5,
             "top_p": 0.9,
             "stop_sequences": [self.end_marker]
         })

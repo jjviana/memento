@@ -36,6 +36,7 @@ jmespath==1.0.1
 joblib==1.2.0
 kiwisolver==1.4.4
 langcodes==3.3.0
+lark==1.1.7
 lxml==4.9.3
 MarkupSafe==2.1.2
 matplotlib==3.7.1
@@ -83,7 +84,7 @@ typer==0.7.0
 typing_extensions==4.5.0
 tzdata==2023.3
 uritemplate==4.1.1
-urllib3==1.26.15
+urllib3==1.26.17
 wasabi==1.1.1
 wcwidth==0.2.6
 yarl==1.8.2

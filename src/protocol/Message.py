@@ -1,6 +1,7 @@
 import json
 import pprint
 from dataclasses import dataclass
+from typing import List
 
 from lark import Lark, Transformer, Discard
 
@@ -18,12 +19,18 @@ grammar = '''
 
 @dataclass
 class Message:
+    """"
+    A message from one entity to another
+    """
     msg_from: str
     msg_to: str
     msg_content: str
 
 @dataclass
 class EmbeddedMessage:
+    """"
+    A message potentially embedded in other text
+    """
     before_content: str
     message: Message
     after_content: str
@@ -68,20 +75,10 @@ class MessageTransformer(Transformer):
 parser = Lark(grammar, parser='lalr', transformer=MessageTransformer())
 
 
-def parse_message(message):
+def parse_message(message) -> List[EmbeddedMessage]:
     return parser.parse(message)
 
 
-message1 = "Hello there!Message for you:\n{{FROM:entity1 TO: xntity2}}Some content here{{END}}Bye."
-result1 = parse_message(message1)
-print(result1)
 
-message2 = message1+"\nHello again!Nice to meet you, here is a message:\n{{FROM:entity1 TO: entity2}}Some more \ncontent here{{END}}Bye for reals!"
-result2 = parse_message(message2)
-print(result2)
-
-message3 = "{{FROM:entity1 TO: entity2}}    \n🤨{{END}}"
-result3 = parse_message(message3)
-print(result3)
 
 

@@ -3,6 +3,7 @@ from typing import Callable
 from .subprocess_tool import SubProcessTool
 from tools_manager.utils import _load_file,utf8
 from prompts import PromptsManager
+from protocol import Message
 class ToolsManager:
     def __init__(self, base_dir: str,memento_factory: Callable = None):
         self.tools = {}
@@ -36,24 +37,13 @@ class ToolsManager:
     def get_tools(self)->list[str]:
         return list(self.tools.keys())
     
-    def process_command(self,command: str) -> tuple[str,str]:
-        # The command is in the format {{FROM:assistant TO:<tool>}}<command>{{END}}
+    def process_command(self,message: Message) -> tuple[str,str]:
+        # The command is in the format {{FROM:memento TO:<tool>}}<command>{{END}}
         # (command can be multi-line)
         # We need to extract the tool name and the command
-        # check if the message is really from the assistant
-        if not command.startswith("{{FROM:memento TO:"):
-            return "system","Invalid format"
-        
-        tool_name = command[command.find("TO:")+3:command.find("}}")]
-        # ignore anything in the tool name after reason=
-        if " reason=" in tool_name:
-            tool_name = tool_name[:tool_name.find(" reason=")]
-            tool_name = tool_name.strip()
-
-        command = command[command.find("}}")+2:]
-        command = command[:command.find("{{END}}")]
+        command = message.msg_content
+        tool_name = message.msg_to
         command = command.strip()
-        
         
         # Process the command
         if tool_name in self.tools:
@@ -61,11 +51,7 @@ class ToolsManager:
         else:
             return "system","Unknown tool: " + tool_name
         
-        
-    
-
-
-    
+     
 
 
     
